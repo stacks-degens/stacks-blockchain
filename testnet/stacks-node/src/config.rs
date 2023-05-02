@@ -862,6 +862,13 @@ impl Config {
                         .expect(&format!("FATAL: not a valid principal identifier: {}", c))
                 }),
                 segwit: miner.segwit.unwrap_or(miner_default_config.segwit),
+                stacks_seed: miner.stacks_seed.as_ref().map(|c| {hex_bytes(c).expect("FATAL: Invalid hex string in stacks_seed")}),
+                /// TODO: delete if everything alright
+                /// method 2 - working
+                // stacks_seed: match miner.stacks_seed.as_ref() {
+                //     Some(seed_str) => Some(hex_bytes(seed_str).expect("FATAL: Invalid hex string in stacks_seed")),
+                //     None => miner_default_config.stacks_seed.clone(),
+                // },
                 wait_for_block_download: miner_default_config.wait_for_block_download,
                 nonce_cache_size: miner
                     .nonce_cache_size
@@ -1844,6 +1851,8 @@ pub struct MinerConfig {
     pub block_reward_recipient: Option<PrincipalData>,
     /// If possible, mine with a p2wpkh address
     pub segwit: bool,
+    /// seed to be used for miner in the mining pool flows
+    pub stacks_seed: Option<Vec<u8>>,
     /// Wait for a downloader pass before mining.
     /// This can only be disabled in testing; it can't be changed in the config file.
     pub wait_for_block_download: bool,
@@ -1862,6 +1871,7 @@ impl MinerConfig {
             probability_pick_no_estimate_tx: 5,
             block_reward_recipient: None,
             segwit: false,
+            stacks_seed: None,
             wait_for_block_download: true,
             nonce_cache_size: 10_000,
             candidate_retry_cache_size: 10_000,
@@ -1979,6 +1989,7 @@ pub struct MinerConfigFile {
     pub probability_pick_no_estimate_tx: Option<u8>,
     pub block_reward_recipient: Option<String>,
     pub segwit: Option<bool>,
+    pub stacks_seed: Option<String>,
     pub nonce_cache_size: Option<u64>,
     pub candidate_retry_cache_size: Option<u64>,
     pub unprocessed_block_deadline_secs: Option<u64>,
